@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌱 Agente Instagram — maliplastt</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--v1:#1e3d1f;--v2:#3d6b3f;--v3:#6a9b4a;--v4:#a8cc7a;--crema:#f4ede0;--crema2:#ebe0ce;--crema3:#ddd0ba;--marron:#3a2a1a;--acento:#c8973a;--blanco:#fdfaf4;--azul:#1877F2;--verde-ok:#16a34a;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Outfit',sans-serif;background:var(--blanco);color:var(--marron);min-height:100vh;}
+  header{background:var(--v1);}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.8rem;flex-wrap:wrap;gap:.8rem;}
+  .header-brand{display:flex;align-items:center;gap:.9rem;}
+  .header-logo{width:46px;height:46px;background:linear-gradient(135deg,var(--v3),var(--acento));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+  .header-title{font-family:'Lora',serif;color:#fff;font-size:1.2rem;}
+  .header-sub{color:rgba(255,255,255,.5);font-size:.72rem;}
+  .header-badges{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .hbadge{padding:.3rem .8rem;border-radius:999px;font-size:.72rem;border:1px solid;}
+  .hbadge.green{color:var(--v4);border-color:rgba(168,204,122,.3);background:rgba(168,204,122,.1);}
+  .hbadge.blue{color:#90caf9;border-color:rgba(144,202,249,.3);background:rgba(144,202,249,.08);}
+  .hbadge.ig{color:#f9a8d4;border-color:rgba(249,168,212,.3);background:rgba(249,168,212,.08);}
+  header::after{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--v3),var(--acento),var(--v3));}
+  .tabs-bar{background:var(--v1);display:flex;padding:0 1.5rem;overflow-x:auto;border-bottom:2px solid rgba(255,255,255,.06);}
+  .tab-btn{padding:.7rem 1.1rem;font-size:.8rem;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+  .tab-btn:hover{color:rgba(255,255,255,.7);}
+  .tab-btn.active{color:var(--v4);border-bottom-color:var(--v4);}
+  .container{max-width:960px;margin:0 auto;padding:1.8rem 1.2rem;}
+  .panel{display:none;}.panel.active{display:block;}
+  .stitle{font-family:'Lora',serif;font-size:1.1rem;color:var(--v2);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;}
+  .repo-dropzone{border:2.5px dashed var(--crema3);border-radius:18px;padding:2.5rem 2rem;text-align:center;cursor:pointer;transition:all .25s;background:var(--crema);position:relative;margin-bottom:1.3rem;}
+  .repo-dropzone:hover,.repo-dropzone.dragover{border-color:var(--v3);background:#eef5e4;}
+  .repo-dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .dz-icon{font-size:2.5rem;margin-bottom:.6rem;}
+  .dz-title{font-family:'Lora',serif;font-size:1rem;color:var(--v2);margin-bottom:.3rem;}
+  .dz-sub{font-size:.78rem;color:#999;}
+  .foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.7rem;margin-bottom:1.2rem;}
+  .foto-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:all .2s;background:var(--crema2);}
+  .foto-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .foto-item:hover{transform:scale(1.03);box-shadow:0 5px 18px rgba(0,0,0,.12);}
+  .foto-item.selected{border-color:var(--v3);box-shadow:0 0 0 4px rgba(106,155,74,.2);}
+  .foto-check{position:absolute;top:5px;right:5px;width:21px;height:21px;background:var(--v3);border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:700;}
+  .foto-item.selected .foto-check{display:flex;}
+  .foto-del{position:absolute;top:5px;left:5px;width:21px;height:21px;background:rgba(200,50,50,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.65rem;opacity:0;transition:opacity .2s;cursor:pointer;z-index:2;}
+  .foto-item:hover .foto-del{opacity:1;}
+  .foto-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:.62rem;padding:.4rem .35rem .25rem;text-align:center;}
+  .foto-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem;align-items:center;}
+  .foto-counter{font-size:.8rem;color:#888;margin-left:auto;}
+  .foto-counter span{color:var(--v2);font-weight:600;}
+  .foto-selector-mini{background:var(--crema);border-radius:14px;padding:1.1rem;margin-bottom:1.1rem;border:1.5px solid var(--crema3);}
+  .mini-title{font-size:.78rem;font-weight:600;color:var(--v2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.7rem;display:flex;align-items:center;justify-content:space-between;}
+  .foto-mini-grid{display:flex;gap:.55rem;overflow-x:auto;padding-bottom:.3rem;}
+  .foto-mini-grid::-webkit-scrollbar{height:3px;}
+  .foto-mini-grid::-webkit-scrollbar-thumb{background:var(--crema3);border-radius:99px;}
+  .foto-mini-thumb{width:65px;height:65px;border-radius:9px;object-fit:cover;border:2.5px solid transparent;cursor:pointer;flex-shrink:0;transition:all .2s;}
+  .foto-mini-thumb:hover{border-color:var(--v3);}
+  .foto-mini-thumb.selected{border-color:var(--v3);box-shadow:0 0 0 3px rgba(106,155,74,.25);}
+  .no-fotos-msg{font-size:.8rem;color:#bbb;font-style:italic;padding:.4rem;}
+  .go-repo-btn{font-size:.75rem;color:var(--v3);cursor:pointer;text-decoration:underline;font-weight:500;}
+  .tipo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.55rem;margin-bottom:1.1rem;}
+  .tipo-card{background:var(--crema);border:2px solid var(--crema3);border-radius:11px;padding:.75rem .45rem;text-align:center;cursor:pointer;transition:all .2s;}
+  .tipo-card:hover{border-color:var(--v3);background:#eef5e4;}
+  .tipo-card.selected{border-color:var(--v2);background:#ddf0cc;box-shadow:0 0 0 3px rgba(61,107,63,.1);}
+  .tipo-card .te{font-size:1.35rem;display:block;margin-bottom:.25rem;}
+  .tipo-card .tl{font-size:.7rem;font-weight:500;}
+  .config-box{background:var(--crema);border-radius:13px;padding:1.1rem;margin-bottom:1.1rem;border:1px solid var(--crema3);}
+  .cfg-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem;}
+  @media(max-width:500px){.cfg-row{grid-template-columns:1fr;}}
+  label{font-size:.73rem;font-weight:600;color:var(--v2);display:block;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.5px;}
+  select,textarea,input[type=text],input[type=date],input[type=time]{width:100%;background:var(--blanco);border:1.5px solid var(--crema3);border-radius:9px;padding:.55rem .8rem;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--marron);transition:border-color .2s;resize:vertical;}
+  select:focus,textarea:focus,input:focus{outline:none;border-color:var(--v3);}
+  textarea{min-height:68px;}
+  .tono-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.7rem;}
+  .tono-btn{background:var(--blanco);border:1.5px solid var(--crema3);border-radius:999px;padding:.3rem .8rem;font-size:.75rem;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;color:var(--marron);}
+  .tono-btn.selected{background:var(--v2);border-color:var(--v2);color:white;}
+  .foto-preview-bar{display:none;background:var(--v1);border-radius:11px;padding:.75rem 1rem;margin-bottom:1.1rem;align-items:center;gap:.8rem;border:1px solid rgba(168,204,122,.2);}
+  .foto-preview-bar.show{display:flex;}
+  .foto-preview-bar img{width:48px;height:48px;border-radius:8px;object-fit:cover;}
+  .fpb-title{color:var(--v4);font-size:.8rem;font-weight:600;}
+  .fpb-sub{color:rgba(255,255,255,.45);font-size:.72rem;}
+  .fpb-remove{color:rgba(255,255,255,.35);cursor:pointer;margin-left:auto;font-size:1rem;}
+  .btn-generar{width:100%;background:linear-gradient(135deg,var(--v2),var(--v3));color:white;border:none;border-radius:11px;padding:.85rem 2rem;font-family:'Lora',serif;font-size:.98rem;font-style:italic;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(61,107,63,.3);margin-bottom:1.3rem;}
+  .btn-generar:hover{transform:translateY(-2px);}
+  .btn-generar:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-sec{background:var(--blanco);border:1.5px solid var(--crema3);color:var(--v2);border-radius:8px;padding:.5rem .9rem;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s;}
+  .btn-sec:hover{background:var(--crema);border-color:var(--v3);}
+  .loading{display:none;text-align:center;padding:1.8rem;background:var(--crema);border-radius:13px;margin-bottom:1.3rem;}
+  .loading.show{display:block;}
+  .spinner{width:42px;height:42px;border:3px solid var(--crema3);border-top-color:var(--v3);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto .7rem;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{font-family:'Lora',serif;font-style:italic;color:var(--v2);font-size:.92rem;}
+  .loading-sub{font-size:.76rem;color:#aaa;margin-top:.3rem;}
+  .resultado{display:none;animation:fadeUp .4s ease forwards;}
+  .resultado.show{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .post-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem;}
+  @media(max-width:640px){.post-wrap{grid-template-columns:1fr;}}
+  .col-label{font-size:.72rem;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem;}
+  .post-preview{background:white;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.09);overflow:hidden;border:1px solid #ece8e0;}
+  .post-header{display:flex;align-items:center;gap:.65rem;padding:.8rem .95rem;border-bottom:1px solid #f0ece5;}
+  .post-avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--v2),var(--acento));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+  .post-username{font-weight:700;font-size:.82rem;}
+  .post-location{font-size:.67rem;color:#999;}
+  .post-imagen{width:100%;aspect-ratio:1;position:relative;overflow:hidden;background:linear-gradient(135deg,#2d5016,#4a7c30,#6a9b4a,#c8973a);}
+  .post-imagen img.user-photo{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:1;}
+  .post-imagen-overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:1.2rem;background:linear-gradient(transparent 35%,rgba(0,0,0,.55) 100%);}
+  .post-imagen-overlay.no-photo{justify-content:center;background:none;}
+  .post-imagen-emoji{font-size:3.5rem;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3));margin-bottom:.5rem;}
+  .post-imagen-titulo{font-family:'Lora',serif;font-size:clamp(.9rem,2.5vw,1.25rem);color:white;text-shadow:0 2px 12px rgba(0,0,0,.5);text-align:center;line-height:1.3;}
+  .post-imagen-sub{font-size:.75rem;color:rgba(255,255,255,.8);margin-top:.25rem;font-style:italic;text-align:center;}
+  .ia-badge{position:absolute;top:7px;right:7px;z-index:3;background:rgba(30,61,31,.88);border:1px solid rgba(168,204,122,.4);color:var(--v4);font-size:.65rem;padding:.22rem .5rem;border-radius:999px;}
+  .post-acciones{padding:.65rem .95rem;display:flex;gap:.85rem;border-bottom:1px solid #f0ece5;}
+  .post-acciones span{font-size:1.1rem;cursor:pointer;}
+  .post-caption{padding:.8rem .95rem;font-size:.82rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:160px;overflow-y:auto;}
+  .hashtags{color:#1877c5;font-size:.78rem;padding:0 .95rem .95rem;line-height:1.9;word-break:break-word;}
+  .buffer-panel{background:linear-gradient(135deg,#f0fdf4,#f0f9ff);border:1.5px solid #86efac;border-radius:14px;padding:1.3rem;}
+  .buffer-panel h3{color:var(--verde-ok);font-family:'Lora',serif;font-size:.95rem;margin-bottom:1rem;}
+  .schedule-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.9rem;}
+  .buffer-status{background:white;border-radius:10px;padding:.8rem;margin-bottom:.9rem;border:1px solid #bbf7d0;font-size:.8rem;display:flex;align-items:center;gap:.6rem;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .btn-publicar{width:100%;background:linear-gradient(135deg,#16a34a,#22c55e);color:white;border:none;border-radius:11px;padding:1rem 2rem;font-family:'Lora',serif;font-size:1.05rem;font-style:italic;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(34,197,94,.35);margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.6rem;}
+  .btn-publicar:hover{transform:translateY(-2px);}
+  .btn-publicar:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .pub-loading{display:none;text-align:center;padding:1.5rem;background:#f0fdf4;border-radius:11px;margin-top:.8rem;border:1px solid #bbf7d0;}
+  .pub-loading.show{display:block;}
+  .pub-spinner{width:36px;height:36px;border:3px solid #bbf7d0;border-top-color:#22c55e;border-radius:50%;animation:spin .85s linear infinite;margin:0 auto .6rem;}
+  .pub-text{font-family:'Lora',serif;font-style:italic;color:#16a34a;font-size:.88rem;}
+  .pub-exito{display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:11px;padding:1.2rem;margin-top:.8rem;text-align:center;}
+  .pub-exito.show{display:block;}
+  .pub-exito .exito-icon{font-size:2.5rem;margin-bottom:.5rem;}
+  .pub-exito h4{font-family:'Lora',serif;color:#16a34a;margin-bottom:.4rem;}
+  .pub-exito p{font-size:.8rem;color:#555;line-height:1.5;}
+  .pub-exito a{color:var(--azul);}
+  .pub-error{display:none;background:#fef2f2;border:1.5px solid #fecaca;border-radius:11px;padding:1rem;margin-top:.8rem;}
+  .pub-error.show{display:block;}
+  .pub-error p{font-size:.8rem;color:#dc2626;line-height:1.6;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+  .info-card{background:var(--crema);border-radius:11px;padding:.9rem;border-left:3px solid var(--v3);}
+  .info-card h4{font-family:'Lora',serif;font-size:.82rem;color:var(--v2);margin-bottom:.35rem;}
+  .info-card p{font-size:.78rem;line-height:1.5;}
+  .estrategia-box{background:linear-gradient(135deg,#edf5e0,#faf5ec);border:1.5px solid #c2d9a8;border-radius:13px;padding:1.1rem;margin-bottom:1.1rem;}
+  .estrategia-box h3{font-family:'Lora',serif;color:var(--v2);margin-bottom:.7rem;font-size:.95rem;}
+  .estr-item{display:flex;gap:.55rem;margin-bottom:.55rem;align-items:flex-start;}
+  .estr-dot{width:6px;height:6px;background:var(--v3);border-radius:50%;margin-top:.38rem;flex-shrink:0;}
+  .estr-item p{font-size:.8rem;line-height:1.5;}
+  .botones-row{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1.3rem;}
+  .btn-copy{flex:1;min-width:110px;background:white;border:1.5px solid var(--v3);color:var(--v2);border-radius:8px;padding:.55rem .7rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;}
+  .btn-copy:hover{background:var(--v2);color:white;}
+  .btn-copy.copied{background:var(--v2);color:white;}
+  .hist-item{background:var(--crema);border-radius:11px;padding:.9rem;margin-bottom:.65rem;border:1px solid var(--crema3);cursor:pointer;transition:all .2s;display:flex;gap:.75rem;}
+  .hist-item:hover{border-color:var(--v3);}
+  .hist-thumb{width:50px;height:50px;border-radius:8px;flex-shrink:0;background:var(--crema2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;overflow:hidden;}
+  .hist-thumb img{width:100%;height:100%;object-fit:cover;}
+  .hist-body{flex:1;min-width:0;}
+  .hist-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem;flex-wrap:wrap;gap:.3rem;}
+  .hist-tipo{font-size:.7rem;background:var(--v2);color:white;border-radius:999px;padding:.12rem .6rem;}
+  .hist-pub{font-size:.7rem;background:#16a34a;color:white;border-radius:999px;padding:.12rem .6rem;margin-left:.3rem;}
+  .hist-fecha{font-size:.7rem;color:#999;}
+  .hist-preview{font-size:.8rem;color:var(--marron);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .dia-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem;margin-bottom:.9rem;}
+  @media(max-width:560px){.dia-grid{grid-template-columns:repeat(4,1fr);}}
+  .dia-card{background:var(--crema);border-radius:9px;padding:.6rem .25rem;text-align:center;border:1.5px solid var(--crema3);cursor:pointer;transition:all .2s;}
+  .dia-card:hover,.dia-card.active{border-color:var(--v3);background:#e5f2d5;}
+  .dia-nombre{font-weight:700;color:var(--v2);font-size:.72rem;}
+  .dia-emoji{font-size:1rem;margin:.2rem 0;}
+  .dia-tipo{color:#777;font-size:.62rem;}
+  .notif{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;background:var(--v2);color:white;padding:.75rem 1.2rem;border-radius:11px;font-size:.83rem;box-shadow:0 6px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .35s;pointer-events:none;max-width:300px;line-height:1.4;}
+  .notif.show{transform:translateY(0);opacity:1;}
+  .notif.ok{background:#16a34a;}
+  .notif.err{background:#dc2626;}
+  footer{text-align:center;padding:1.3rem;background:var(--crema);border-top:1px solid var(--crema3);font-size:.72rem;color:#aaa;}
+  footer span{color:var(--v3);}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">🌱</div>
+      <div>
+        <div class="header-title">Agente Instagram</div>
+        <div class="header-sub">Macetas de Yerba Mate</div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <div class="hbadge ig">📷 @maliplastt</div>
+      <div class="hbadge green">✨ Claude AI</div>
+      <div class="hbadge blue">🟢 Buffer conectado</div>
+    </div>
+  </div>
+</header>
+<div class="tabs-bar">
+  <div class="tab-btn active" onclick="switchTab('repo')">📂 Mis Fotos</div>
+  <div class="tab-btn" onclick="switchTab('crear')">✍️ Crear y Publicar</div>
+  <div class="tab-btn" onclick="switchTab('semana')">📅 Semana</div>
+  <div class="tab-btn" onclick="switchTab('historial')">📁 Historial</div>
+</div>
+<div class="container">
+
+<!-- REPO -->
+<div class="panel active" id="panel-repo">
+  <p class="stitle">📸 Repositorio de fotos</p>
+  <p style="font-size:.82rem;color:#888;margin-bottom:1.1rem;">Subí tus fotos de las macetas. Claude las analiza, genera el caption y Buffer lo publica solo en @maliplastt.</p>
+  <div class="repo-dropzone" id="dropzone">
+    <input type="file" accept="image/*" multiple onchange="handleFiles(this.files)">
+    <div class="dz-icon">📤</div>
+    <div class="dz-title">Arrastrá o hacé clic para subir fotos</div>
+    <div class="dz-sub">JPG · PNG · WEBP — Podés subir varias a la vez</div>
+  </div>
+  <div class="foto-actions">
+    <button class="btn-sec" onclick="deleteFotoSel()">🗑 Eliminar</button>
+    <button class="btn-sec" onclick="deseleccionarFoto()">✖ Deseleccionar</button>
+    <div class="foto-counter">Fotos: <span id="foto-count">0</span></div>
+  </div>
+  <div class="foto-grid" id="foto-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:#ccc;font-style:italic;font-size:.85rem;">Todavía no subiste fotos 🌿</div>
+  </div>
+  <div style="background:linear-gradient(135deg,#f0fdf4,#f0f9ff);border-radius:13px;padding:1.1rem;border:1px solid #86efac;">
+    <div style="font-family:'Lora',serif;color:#16a34a;font-size:.92rem;margin-bottom:.6rem;">🚀 Flujo automático para @maliplastt</div>
+    <div style="font-size:.8rem;color:#555;line-height:1.9;">
+      1️⃣ Subís tu foto acá<br>
+      2️⃣ Vas a <strong>Crear y Publicar</strong> → elegís la foto<br>
+      3️⃣ Claude analiza y escribe el caption solo<br>
+      4️⃣ Elegís fecha y hora<br>
+      5️⃣ Clic en <strong>"Publicar en Instagram"</strong><br>
+      ✅ Buffer sube todo solo a <strong>@maliplastt</strong>
+    </div>
+  </div>
+</div>
+
+<!-- CREAR -->
+<div class="panel" id="panel-crear">
+  <div class="foto-selector-mini">
+    <div class="mini-title">
+      <span>📷 Elegí la foto del post</span>
+      <span class="go-repo-btn" onclick="switchTab('repo')">+ Subir fotos</span>
+    </div>
+    <div class="foto-mini-grid" id="foto-mini-grid">
+      <span class="no-fotos-msg">No tenés fotos. <span class="go-repo-btn" onclick="switchTab('repo')">Subí acá</span></span>
+    </div>
+  </div>
+  <div class="foto-preview-bar" id="foto-preview-bar">
+    <img id="fpb-img" src="" alt="">
+    <div style="flex:1"><div class="fpb-title">✅ Foto seleccionada — Claude la analizará</div><div class="fpb-sub" id="fpb-sub"></div></div>
+    <span class="fpb-remove" onclick="deseleccionarFoto()">✕</span>
+  </div>
+  <p class="stitle">📝 Tipo de publicación</p>
+  <div class="tipo-grid">
+    <div class="tipo-card selected" data-tipo="producto" onclick="selectTipo(this)"><span class="te">🪴</span><span class="tl">Producto</span></div>
+    <div class="tipo-card" data-tipo="proceso" onclick="selectTipo(this)"><span class="te">🌿</span><span class="tl">Proceso</span></div>
+    <div class="tipo-card" data-tipo="eco" onclick="selectTipo(this)"><span class="te">♻️</span><span class="tl">Impacto Eco</span></div>
+    <div class="tipo-card" data-tipo="testimonio" onclick="selectTipo(this)"><span class="te">💬</span><span class="tl">Testimonio</span></div>
+    <div class="tipo-card" data-tipo="promo" onclick="selectTipo(this)"><span class="te">🎁</span><span class="tl">Promoción</span></div>
+    <div class="tipo-card" data-tipo="consejo" onclick="selectTipo(this)"><span class="te">💡</span><span class="tl">Consejo</span></div>
+    <div class="tipo-card" data-tipo="historia" onclick="selectTipo(this)"><span class="te">📖</span><span class="tl">Historia</span></div>
+    <div class="tipo-card" data-tipo="pregunta" onclick="selectTipo(this)"><span class="te">❓</span><span class="tl">Interacción</span></div>
+  </div>
+  <div class="config-box">
+    <div class="cfg-row">
+      <div><label>🎯 Objetivo</label><select id="objetivo"><option value="ventas">Generar ventas</option><option value="awareness">Dar a conocer</option><option value="engagement">Generar interacción</option><option value="comunidad">Construir comunidad</option></select></div>
+      <div><label>📍 Formato</label><select id="plataforma"><option value="feed">Feed</option><option value="reels">Reels</option><option value="stories">Stories</option><option value="carousel">Carrusel</option></select></div>
+    </div>
+    <div style="margin-bottom:.7rem;">
+      <label>🎨 Tono</label>
+      <div class="tono-row">
+        <div class="tono-btn selected" onclick="selectTono(this)" data-tono="cercano">Cercano</div>
+        <div class="tono-btn" onclick="selectTono(this)" data-tono="profesional">Profesional</div>
+        <div class="tono-btn" onclick="selectTono(this)" data-tono="inspirador">Inspirador</div>
+        <div class="tono-btn" onclick="selectTono(this)" data-tono="divertido">Divertido</div>
+        <div class="tono-btn" onclick="selectTono(this)" data-tono="educativo">Educativo</div>
+      </div>
+    </div>
+    <div><label>💬 Detalle extra</label><textarea id="detalle-extra" placeholder="Ej: maceta con cactus, precio $1800..."></textarea></div>
+  </div>
+  <button class="btn-generar" id="btn-generar" onclick="generarPost()">✨ Generar post con Claude AI</button>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">Analizando tu foto...</div>
+    <div class="loading-sub">Claude está escribiendo tu post...</div>
+  </div>
+  <div class="resultado" id="resultado">
+    <p class="stitle">📱 Post listo para publicar</p>
+    <div class="post-wrap">
+      <div>
+        <div class="col-label">Vista previa</div>
+        <div class="post-preview">
+          <div class="post-header">
+            <div class="post-avatar">🌱</div>
+            <div><div class="post-username">maliplastt</div><div class="post-location">📍 Argentina</div></div>
+          </div>
+          <div class="post-imagen" id="post-imagen-box">
+            <div class="post-imagen-overlay no-photo" id="post-overlay">
+              <div class="post-imagen-emoji" id="post-emoji">🪴</div>
+              <div class="post-imagen-titulo" id="post-visual-titulo">Macetas de Yerba Mate</div>
+              <div class="post-imagen-sub" id="post-visual-sub">100% Biodegradable</div>
+            </div>
+          </div>
+          <div class="post-acciones"><span>🤍</span><span>💬</span><span>📤</span><span style="margin-left:auto">🔖</span></div>
+          <div class="post-caption" id="post-caption"></div>
+          <div class="hashtags" id="post-hashtags"></div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">Publicar en @maliplastt</div>
+        <div class="buffer-panel">
+          <h3>🟢 Publicación automática via Buffer</h3>
+          <div class="buffer-status">
+            <div class="dot"></div>
+            <div style="flex:1">
+              <div style="font-weight:600;color:#16a34a;font-size:.82rem;" id="buffer-perfil-label">Detectando perfil...</div>
+              <div style="font-size:.72rem;color:#666;">Buffer conectado</div>
+            </div>
+            <button onclick="diagnosticarBuffer()" style="background:#e8f5e9;border:1px solid #86efac;color:#16a34a;border-radius:7px;padding:.3rem .7rem;font-size:.72rem;cursor:pointer;font-family:sans-serif;white-space:nowrap;">🔍 Ver perfiles</button>
+          </div>
+          <div id="buffer-debug-box" style="display:none;background:#1a2a1a;border-radius:9px;padding:.9rem;margin-bottom:.9rem;">
+            <pre style="font-size:.72rem;color:#4ec9b0;white-space:pre-wrap;line-height:1.6;" id="buffer-debug"></pre>
+          </div>
+          <div class="schedule-row">
+            <div><label>📅 Fecha</label><input type="date" id="pub-fecha"></div>
+            <div><label>⏰ Hora</label><input type="time" id="pub-hora" value="19:00"></div>
+          </div>
+          <div style="margin-bottom:.9rem;">
+            <label>📌 Cuándo publicar</label>
+            <select id="pub-tipo">
+              <option value="scheduled">Programar para la fecha elegida</option>
+              <option value="now">Publicar ahora mismo</option>
+            </select>
+          </div>
+          <button class="btn-publicar" id="btn-publicar" onclick="publicarEnBuffer()">
+            🚀 Publicar en Instagram
+          </button>
+          <div class="pub-loading" id="pub-loading">
+            <div class="pub-spinner"></div>
+            <div class="pub-text" id="pub-loading-text">Enviando a Buffer...</div>
+          </div>
+          <div class="pub-exito" id="pub-exito">
+            <div class="exito-icon">✅</div>
+            <h4>¡Enviado a Buffer!</h4>
+            <p id="pub-exito-msg">Tu post fue programado en @maliplastt.</p>
+            <p style="margin-top:.5rem;"><a href="https://buffer.com" target="_blank">Ver en Buffer →</a></p>
+          </div>
+          <div class="pub-error" id="pub-error">
+            <p id="pub-error-msg"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid" id="info-grid"></div>
+    <div class="estrategia-box"><h3>🗺️ Estrategia</h3><div id="estrategia-items"></div></div>
+    <div class="botones-row">
+      <button class="btn-copy" onclick="copiarEl('post-caption',this,'📋 Caption','✅ Copiado')">📋 Caption</button>
+      <button class="btn-copy" onclick="copiarEl('post-hashtags',this,'🏷️ Hashtags','✅ Copiados')">🏷️ Hashtags</button>
+      <button class="btn-copy" onclick="copiarTodo(this)">📦 Copiar todo</button>
+      <button class="btn-copy" onclick="generarPost()">🔄 Regenerar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEMANA -->
+<div class="panel" id="panel-semana">
+  <p class="stitle">📅 Plan semanal</p>
+  <div class="dia-grid" id="dia-grid"></div>
+  <div id="dia-detalle"></div>
+  <button class="btn-generar" style="margin-top:1.3rem;" onclick="generarSemana()">🗓️ Generar plan semanal con Claude</button>
+  <div class="loading" id="loading-semana"><div class="spinner"></div><div class="loading-text">Armando tu calendario...</div></div>
+  <div id="resultado-semana"></div>
+</div>
+
+<!-- HISTORIAL -->
+<div class="panel" id="panel-historial">
+  <p class="stitle">📁 Historial</p>
+  <div id="historial-lista"><p style="color:#bbb;text-align:center;padding:2rem;font-style:italic;">Generá tu primer post en "Crear y Publicar" 🌱</p></div>
+</div>
+
+</div>
+<div class="notif" id="notif"></div>
+<footer>@maliplastt · Claude AI + Buffer · <span>Publicación automática en Instagram</span> ✨</footer>
+
+<script>
+const BUFFER_TOKEN = '-pmJHSXIK4RWnMB3FTA8mMDbPF3cQ1OYdqlhqyyWiMc';
+const IG_USERNAME = 'maliplastt';
+let fotos=[], fotoSeleccionada=null, tipoSeleccionado='producto', tonoSeleccionado='cercano', historial=[];
+let bufferProfileId=null, postGenerado=null, fotoGenerada=null;
+
+window.onload=()=>{
+  const m=new Date(); m.setDate(m.getDate()+1);
+  document.getElementById('pub-fecha').value=m.toISOString().split('T')[0];
+  initSemana();
+  cargarProfileBuffer();
+};
+
+async function cargarProfileBuffer(){
+  try{
+    const r=await fetch('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN);
+    const profiles=await r.json();
+    console.log('Buffer profiles raw:', JSON.stringify(profiles));
+    if(Array.isArray(profiles)&&profiles.length>0){
+      // Tomar el primer perfil disponible (cualquier red social)
+      const perfil = profiles.find(p=>p.service==='instagram') || profiles[0];
+      bufferProfileId = perfil.id;
+      console.log('Perfil seleccionado:', perfil.service, perfil.formatted_username||perfil.id);
+      const lbl=document.getElementById('buffer-perfil-label');
+      if(lbl) lbl.textContent='@'+(perfil.formatted_username||perfil.id)+' listo';
+      mostrarNotif('✅ Buffer: @'+(perfil.formatted_username||perfil.service)+' conectado','ok');
+    } else if(profiles && profiles.code){
+      console.warn('Buffer error:', profiles.message);
+    }
+  }catch(e){console.warn('Buffer:',e.message);}
+}
+
+async function diagnosticarBuffer(){
+  try{
+    mostrarNotif('🔍 Consultando Buffer...','');
+    const r=await fetch('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN);
+    const profiles=await r.json();
+    let msg='';
+    if(Array.isArray(profiles)&&profiles.length>0){
+      msg='✅ Perfiles en Buffer:\n';
+      profiles.forEach(p=>{ msg+=`• ${p.service}: @${p.formatted_username||p.id}\n`; });
+      bufferProfileId=profiles[0].id;
+      msg+='\nUsando: @'+(profiles[0].formatted_username||profiles[0].id);
+    } else {
+      msg='❌ Respuesta Buffer: '+JSON.stringify(profiles);
+    }
+    document.getElementById('buffer-debug').textContent=msg;
+    document.getElementById('buffer-debug-box').style.display='block';
+  }catch(e){
+    document.getElementById('buffer-debug').textContent='❌ Error: '+e.message;
+    document.getElementById('buffer-debug-box').style.display='block';
+  }
+}
+
+function switchTab(t){
+  ['repo','crear','semana','historial'].forEach((x,i)=>{
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active',x===t);
+    document.getElementById('panel-'+x).classList.toggle('active',x===t);
+  });
+  if(t==='crear')renderMiniGrid();
+}
+
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+
+function handleFiles(files){
+  Array.from(files).filter(f=>f.type.startsWith('image/')).forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>{fotos.push({id:Date.now()+Math.random(),name:file.name,dataUrl:e.target.result,base64:e.target.result.split(',')[1],mimeType:file.type});renderFotoGrid();renderMiniGrid();};
+    r.readAsDataURL(file);
+  });
+}
+
+function renderFotoGrid(){
+  document.getElementById('foto-count').textContent=fotos.length;
+  const g=document.getElementById('foto-grid');
+  if(!fotos.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#ccc;font-style:italic;">Todavía no subiste fotos 🌿</div>';return;}
+  g.innerHTML=fotos.map(f=>`<div class="foto-item ${String(fotoSeleccionada)===String(f.id)?'selected':''}" onclick="toggleFotoRepo('${f.id}')"><img src="${f.dataUrl}" loading="lazy"><div class="foto-check">✓</div><div class="foto-del" onclick="event.stopPropagation();deleteFoto('${f.id}')">✕</div><div class="foto-label">${f.name.substring(0,16)}${f.name.length>16?'…':''}</div></div>`).join('');
+}
+function toggleFotoRepo(id){fotoSeleccionada=String(fotoSeleccionada)===String(id)?null:id;renderFotoGrid();renderMiniGrid();updatePreviewBar();}
+function deleteFoto(id){fotos=fotos.filter(f=>String(f.id)!==String(id));if(String(fotoSeleccionada)===String(id)){fotoSeleccionada=null;updatePreviewBar();}renderFotoGrid();renderMiniGrid();}
+function deleteFotoSel(){if(fotoSeleccionada)deleteFoto(fotoSeleccionada);}
+function renderMiniGrid(){
+  const mg=document.getElementById('foto-mini-grid');
+  if(!fotos.length){mg.innerHTML='<span class="no-fotos-msg">No tenés fotos. <span class="go-repo-btn" onclick="switchTab(\'repo\')">Subí acá</span></span>';return;}
+  mg.innerHTML=fotos.map(f=>`<img class="foto-mini-thumb ${String(fotoSeleccionada)===String(f.id)?'selected':''}" src="${f.dataUrl}" title="${f.name}" onclick="selectFotoParaPost('${f.id}')">`).join('');
+}
+function selectFotoParaPost(id){fotoSeleccionada=String(fotoSeleccionada)===String(id)?null:id;renderMiniGrid();renderFotoGrid();updatePreviewBar();}
+function updatePreviewBar(){
+  const bar=document.getElementById('foto-preview-bar');
+  if(fotoSeleccionada){const f=fotos.find(x=>String(x.id)===String(fotoSeleccionada));if(f){bar.classList.add('show');document.getElementById('fpb-img').src=f.dataUrl;document.getElementById('fpb-sub').textContent=f.name;}}
+  else bar.classList.remove('show');
+}
+function deseleccionarFoto(){fotoSeleccionada=null;updatePreviewBar();renderMiniGrid();renderFotoGrid();}
+function selectTipo(el){document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');tipoSeleccionado=el.dataset.tipo;}
+function selectTono(el){document.querySelectorAll('.tono-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');tonoSeleccionado=el.dataset.tono;}
+
+const lMsgs=['Analizando tu foto...','Detectando colores y detalles...','Escribiendo el caption...','Eligiendo los mejores hashtags...','¡Casi listo!'];
+const tLabels={producto:'mostrar el producto macetas de yerba mate biodegradables',proceso:'mostrar el proceso artesanal de fabricación',eco:'destacar el impacto ecológico y que se puede enterrar en tierra',testimonio:'compartir experiencia de cliente satisfecho',promo:'anunciar una promoción o descuento',consejo:'dar consejo de jardinería o cuidado de plantas',historia:'contar la historia y origen del emprendimiento',pregunta:'hacer una pregunta para generar interacción'};
+
+async function generarPost(){
+  const btn=document.getElementById('btn-generar');
+  btn.disabled=true;
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('resultado').classList.remove('show');
+  document.getElementById('pub-exito').classList.remove('show');
+  document.getElementById('pub-error').classList.remove('show');
+  let mi=0;const iv=setInterval(()=>{document.getElementById('loading-text').textContent=lMsgs[mi%lMsgs.length];mi++;},1100);
+  const fo=fotoSeleccionada?fotos.find(f=>String(f.id)===String(fotoSeleccionada)):null;
+  const pt=`Sos experto en marketing digital para emprendimientos sustentables en Argentina. Emprendimiento: Macetas biodegradables de yerba mate usada, 100% eco-friendly, se entierran directo con la planta, artesanal argentino. Instagram: @${IG_USERNAME}. Tipo: ${tLabels[tipoSeleccionado]} | Objetivo: ${document.getElementById('objetivo').value} | Formato: ${document.getElementById('plataforma').value} | Tono: ${tonoSeleccionado}${document.getElementById('detalle-extra').value?' | Extra: '+document.getElementById('detalle-extra').value:''}. ${fo?'Se adjunta foto real. Analizála y describí brevemente lo que ves.':'Sin foto.'} Respondé SOLO JSON sin markdown: {"descripcion_foto":"...","emoji_principal":"emoji","titulo_visual":"max 6 palabras","subtitulo_visual":"max 5 palabras","caption":"caption completo emojis español argentino max 150 palabras","hashtags":["15","hashtags","sin","numeral"],"mejor_horario":"...","mejor_dia":"...","alcance_estimado":"...","tip_imagen":"...","estrategia":[{"titulo":"Por qué funciona","texto":"..."},{"titulo":"Call to action","texto":"..."},{"titulo":"Consejo extra","texto":"..."}]}`;
+  try{
+    const msgs=fo?[{role:'user',content:[{type:'image',source:{type:'base64',media_type:fo.mimeType,data:fo.base64}},{type:'text',text:pt}]}]:[{role:'user',content:pt}];
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:msgs})});
+    const data=await res.json();
+    const parsed=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    clearInterval(iv);postGenerado=parsed;fotoGenerada=fo;
+    mostrarResultado(parsed,fo);guardarHistorial(parsed,fo);
+  }catch(e){
+    clearInterval(iv);
+    const fb={descripcion_foto:fo?'Maceta artesanal':'sin foto',emoji_principal:'🪴',titulo_visual:'Sembrá con conciencia',subtitulo_visual:'100% Biodegradable',caption:'¿Sabías que podés plantar sin sacar tu planta de la maceta? 🌿\n\nNuestras macetas de yerba mate van directo a la tierra. Sin plásticos, sin residuos.\n\nHechas a mano en Argentina. ♻️💚\n\n📲 Escribinos por DM',hashtags:['macetasbiodegradables','maliplastt','plantasmadre','ecofriendly','emprendimientoargentino','jardineriasostenible','reciclaje','vidaecologica','sustentable','plantasdelhogar','verdear','hechoenargentina','macetasartesanales','biodegradable','cuidaelmundo'],mejor_horario:'19:00–21:00 hs',mejor_dia:'Martes',alcance_estimado:'200–800 personas',tip_imagen:'Fotografiá sobre tierra con luz natural',estrategia:[{titulo:'Por qué funciona',texto:'Genera curiosidad y destaca el diferencial.'},{titulo:'Call to action',texto:'DM convierte mejor que link en bio.'},{titulo:'Consejo extra',texto:'Mostrá el enterrado para hacerlo viral.'}]};
+    postGenerado=fb;fotoGenerada=fo;mostrarResultado(fb,fo);guardarHistorial(fb,fo);
+  }finally{clearInterval(iv);document.getElementById('loading').classList.remove('show');btn.disabled=false;}
+}
+
+function mostrarResultado(d,fo){
+  const ib=document.getElementById('post-imagen-box'),ov=document.getElementById('post-overlay');
+  ib.querySelector('img.user-photo')?.remove();ib.querySelector('.ia-badge')?.remove();
+  if(fo){const i=document.createElement('img');i.className='user-photo';i.src=fo.dataUrl;ib.insertBefore(i,ov);ov.classList.remove('no-photo');const b=document.createElement('div');b.className='ia-badge';b.textContent='🤖 Claude AI';ib.appendChild(b);}
+  else ov.classList.add('no-photo');
+  document.getElementById('post-emoji').textContent=d.emoji_principal||'🪴';
+  document.getElementById('post-visual-titulo').textContent=d.titulo_visual||'Macetas Verdes';
+  document.getElementById('post-visual-sub').textContent=d.subtitulo_visual||'100% Biodegradable';
+  document.getElementById('post-caption').textContent=d.caption||'';
+  document.getElementById('post-hashtags').textContent=(d.hashtags||[]).map(h=>'#'+h).join(' ');
+  document.getElementById('info-grid').innerHTML=`<div class="info-card"><h4>⏰ Mejor horario</h4><p>${d.mejor_horario||'—'}</p></div><div class="info-card"><h4>📅 Mejor día</h4><p>${d.mejor_dia||'—'}</p></div><div class="info-card"><h4>👁️ Alcance estimado</h4><p>${d.alcance_estimado||'—'}</p></div><div class="info-card"><h4>🔍 Claude detectó</h4><p>${d.descripcion_foto||'Sin foto'}</p></div>`;
+  document.getElementById('estrategia-items').innerHTML=(d.estrategia||[]).map(s=>`<div class="estr-item"><div class="estr-dot"></div><p><strong>${s.titulo}:</strong> ${s.texto}</p></div>`).join('');
+  document.getElementById('resultado').classList.add('show');
+  setTimeout(()=>document.getElementById('resultado').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+async function publicarEnBuffer(){
+  if(!postGenerado){mostrarNotif('⚠️ Primero generá un post','err');return;}
+  const btn=document.getElementById('btn-publicar');
+  const pl=document.getElementById('pub-loading');
+  const pe=document.getElementById('pub-exito');
+  const perr=document.getElementById('pub-error');
+  btn.disabled=true;pl.classList.add('show');pe.classList.remove('show');perr.classList.remove('show');
+  const lms=['Enviando a Buffer...','Subiendo la foto...','Programando en Instagram...','¡Casi listo!'];
+  let li=0;const lv=setInterval(()=>{document.getElementById('pub-loading-text').textContent=lms[li%lms.length];li++;},1200);
+  try{
+    const caption=postGenerado.caption+'\n\n'+(postGenerado.hashtags||[]).map(h=>'#'+h).join(' ');
+    const tipo=document.getElementById('pub-tipo').value;
+    if(!bufferProfileId)await cargarProfileBuffer();
+    if(!bufferProfileId)throw new Error('No se encontró el perfil @'+IG_USERNAME+' en Buffer. Asegurate de conectarlo en buffer.com');
+    let scheduledAt=null;
+    if(tipo==='scheduled'){
+      const fecha=document.getElementById('pub-fecha').value;
+      const hora=document.getElementById('pub-hora').value;
+      if(!fecha||!hora)throw new Error('Seleccioná fecha y hora');
+      scheduledAt=Math.floor(new Date(`${fecha}T${hora}:00-03:00`).getTime()/1000);
+    }
+    const body=new URLSearchParams();
+    body.append('access_token',BUFFER_TOKEN);
+    body.append('profile_ids[]',bufferProfileId);
+    body.append('text',caption);
+    if(tipo==='now')body.append('now','true');
+    if(scheduledAt)body.append('scheduled_at',scheduledAt);
+    if(fotoGenerada)body.append('media[photo]',fotoGenerada.dataUrl);
+    const res=await fetch('https://api.bufferapp.com/1/updates/create.json',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    const result=await res.json();
+    clearInterval(lv);
+    if(result.success||result.updates){
+      pe.classList.add('show');
+      const cuando=tipo==='now'?'ahora mismo':`el ${document.getElementById('pub-fecha').value} a las ${document.getElementById('pub-hora').value} hs`;
+      document.getElementById('pub-exito-msg').textContent=`✅ Post programado para publicarse ${cuando} en @${IG_USERNAME}`;
+      mostrarNotif('🚀 ¡Publicado en Buffer!','ok');
+      if(historial.length>0){historial[0].publicado=true;renderHistorial();}
+    }else throw new Error(result.message||result.error||JSON.stringify(result));
+  }catch(e){
+    clearInterval(lv);
+    perr.classList.add('show');
+    document.getElementById('pub-error-msg').textContent='⚠️ '+e.message+'\n\nTip: asegurate de que @'+IG_USERNAME+' esté conectado como cuenta Business en buffer.com';
+    mostrarNotif('❌ '+e.message,'err');
+  }finally{clearInterval(lv);pl.classList.remove('show');btn.disabled=false;}
+}
+
+function copiarEl(id,btn,ori,ok){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{btn.textContent=ok;btn.classList.add('copied');setTimeout(()=>{btn.textContent=ori;btn.classList.remove('copied');},2000);});}
+function copiarTodo(btn){const t=document.getElementById('post-caption').textContent+'\n\n'+document.getElementById('post-hashtags').textContent;navigator.clipboard.writeText(t).then(()=>{btn.textContent='✅ Copiado!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📦 Copiar todo';btn.classList.remove('copied');},2000);});}
+
+function guardarHistorial(d,fo){
+  historial.unshift({tipo:tipoSeleccionado,fecha:new Date().toLocaleString('es-AR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}),fotoUrl:fo?fo.dataUrl:null,publicado:false,data:d});
+  renderHistorial();
+}
+function renderHistorial(){
+  const l=document.getElementById('historial-lista');
+  if(!historial.length){l.innerHTML='<p style="color:#bbb;text-align:center;padding:2rem;font-style:italic;">Generá tu primer post 🌱</p>';return;}
+  l.innerHTML=historial.map((h,i)=>`<div class="hist-item" onclick="restaurarHistorial(${i})"><div class="hist-thumb">${h.fotoUrl?`<img src="${h.fotoUrl}">`:(h.data.emoji_principal||'🪴')}</div><div class="hist-body"><div class="hist-meta"><span><span class="hist-tipo">${h.tipo}</span>${h.publicado?' <span class="hist-pub">✅ Publicado</span>':''}</span><span class="hist-fecha">${h.fecha}</span></div><div class="hist-preview">${(h.data.caption||'').substring(0,110)}...</div></div></div>`).join('');
+}
+function restaurarHistorial(i){const h=historial[i];if(h.data){postGenerado=h.data;fotoGenerada=h.fotoUrl?{dataUrl:h.fotoUrl}:null;mostrarResultado(h.data,fotoGenerada);}switchTab('crear');setTimeout(()=>document.getElementById('resultado').scrollIntoView({behavior:'smooth'}),200);}
+
+const diasSemana=[{n:'Lun',tipo:'Producto',e:'🪴',f:'Feed'},{n:'Mar',tipo:'Eco',e:'♻️',f:'Reels'},{n:'Mié',tipo:'Proceso',e:'🌿',f:'Carrusel'},{n:'Jue',tipo:'Consejo',e:'💡',f:'Feed'},{n:'Vie',tipo:'Promo',e:'🎁',f:'Stories'},{n:'Sáb',tipo:'Historia',e:'📖',f:'Feed'},{n:'Dom',tipo:'Interacción',e:'❓',f:'Stories'}];
+function initSemana(){document.getElementById('dia-grid').innerHTML=diasSemana.map((d,i)=>`<div class="dia-card" onclick="selectDia(${i})" id="dia-${i}"><div class="dia-nombre">${d.n}</div><div class="dia-emoji">${d.e}</div><div class="dia-tipo">${d.tipo}</div></div>`).join('');}
+function selectDia(i){document.querySelectorAll('.dia-card').forEach(c=>c.classList.remove('active'));document.getElementById('dia-'+i).classList.add('active');const d=diasSemana[i];document.getElementById('dia-detalle').innerHTML=`<div class="estrategia-box"><h3>${d.e} ${d.n} — ${d.tipo}</h3><div class="estr-item"><div class="estr-dot"></div><p><strong>Formato:</strong> ${d.f}</p></div><div class="estr-item"><div class="estr-dot"></div><p><strong>Horario ideal:</strong> ${i<5?'19:00–21:00 hs':'10:00–12:00 hs'}</p></div><button class="btn-generar" style="margin-top:.8rem;font-size:.88rem;padding:.7rem;" onclick="generarParaDia(${i})">✨ Generar este post</button></div>`;}
+function generarParaDia(i){const m=['producto','eco','proceso','consejo','promo','historia','pregunta'];document.querySelectorAll('.tipo-card').forEach(c=>{if(c.dataset.tipo===m[i])selectTipo(c);});switchTab('crear');generarPost();}
+async function generarSemana(){
+  document.getElementById('loading-semana').classList.add('show');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:'Plan 7 días Instagram para @maliplastt, macetas biodegradables de yerba mate, Argentina. JSON sin markdown: {"semana":[{"dia":"Lunes","tipo":"...","hora":"...","tema":"...","idea_caption":"...","formato":"...","objetivo":"..."}],"consejo_general":"..."}'}]})});
+    const data=await r.json();
+    mostrarSemana(JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim()));
+  }catch(e){mostrarSemana({semana:diasSemana.map(d=>({dia:d.n,tipo:d.tipo,hora:'19:30',tema:`Post de ${d.tipo.toLowerCase()}`,idea_caption:`Contenido ${d.tipo} para macetas de yerba mate`,formato:d.f,objetivo:'Aumentar alcance'})),consejo_general:'Publicá diariamente. La consistencia es la clave en Instagram.'});}
+  finally{document.getElementById('loading-semana').classList.remove('show');}
+}
+function mostrarSemana(data){document.getElementById('resultado-semana').innerHTML=`<div class="estrategia-box" style="margin-top:1.1rem;"><h3>💡 Consejo estratégico</h3><p style="font-size:.82rem;line-height:1.6;">${data.consejo_general}</p></div>${(data.semana||[]).map(d=>`<div class="hist-item" style="cursor:default;"><div class="hist-thumb">${diasSemana.find(x=>x.n===d.dia)?.e||'📅'}</div><div class="hist-body"><div class="hist-meta"><span class="hist-tipo">${d.dia} · ${d.formato}</span><span class="hist-fecha">⏰ ${d.hora}</span></div><div style="font-size:.78rem;font-weight:600;color:var(--v2);margin-bottom:.2rem;">${d.tipo} — ${d.tema}</div><div class="hist-preview">${d.idea_caption}</div></div></div>`).join('')}`;}
+
+function mostrarNotif(msg,tipo=''){const n=document.getElementById('notif');n.textContent=msg;n.className='notif '+(tipo||'');n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
