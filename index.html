@@ -392,7 +392,7 @@ window.onload=()=>{
 
 async function cargarProfileBuffer(){
   try{
-    const r=await fetch('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN);
+    const r=await fetch('https://corsproxy.io/?'+encodeURIComponent('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN));
     const profiles=await r.json();
     console.log('Buffer profiles raw:', JSON.stringify(profiles));
     if(Array.isArray(profiles)&&profiles.length>0){
@@ -412,7 +412,7 @@ async function cargarProfileBuffer(){
 async function diagnosticarBuffer(){
   try{
     mostrarNotif('🔍 Consultando Buffer...','');
-    const r=await fetch('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN);
+    const r=await fetch('https://corsproxy.io/?'+encodeURIComponent('https://api.bufferapp.com/1/profiles.json?access_token='+BUFFER_TOKEN));
     const profiles=await r.json();
     let msg='';
     if(Array.isArray(profiles)&&profiles.length>0){
@@ -547,7 +547,7 @@ async function publicarEnBuffer(){
     if(tipo==='now')body.append('now','true');
     if(scheduledAt)body.append('scheduled_at',scheduledAt);
     if(fotoGenerada)body.append('media[photo]',fotoGenerada.dataUrl);
-    const res=await fetch('https://api.bufferapp.com/1/updates/create.json',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    const res=await fetch('https://corsproxy.io/?'+encodeURIComponent('https://api.bufferapp.com/1/updates/create.json'),{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','x-cors-api-key':'temp_'+'test'},body:body.toString()});
     const result=await res.json();
     clearInterval(lv);
     if(result.success||result.updates){
